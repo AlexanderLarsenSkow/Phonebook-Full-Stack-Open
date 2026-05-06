@@ -58,10 +58,31 @@ app.delete('/api/persons/:id', (request, response) => {
   }
 });
 
+function hasName(name) {
+  return !!persons.find(p => p.name === name)
+}
+
 app.post('/api/persons', (request, response) => {
-  const person = request.body;
-  const newId = String(Math.floor(Math.random() * 100000));
-  person.id = newId;
+  const body = request.body;
+  const id = String(Math.floor(Math.random() * 100000));
+
+  if (!body.name || !body.number) {
+    return response.status(404).json({
+      error: 'Name or Number fields are not present in body.'
+    });
+  }
+
+  if (hasName(body.name)) {
+    return response.status(404).json({
+      error: 'This person already exists!'
+    });
+  }
+
+  const person = {
+    id,
+    name: body.name,
+    number: body.number
+  };
 
   persons = persons.concat(person);
   console.log(person);
