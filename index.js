@@ -5,7 +5,22 @@ const app = express();
 
 app.use(express.json());
 
-const logger = morgan('tiny');
+const logger = morgan((tokens, request, response) => {
+  morgan.token('post', (request, response) => {
+    if (request.method === 'POST') {
+      return JSON.stringify(request.body);
+    }
+  });
+
+  return [
+    tokens.method(request, response),
+    tokens.url(request, response),
+    (tokens.status(request, response)),
+    tokens.res(request, response, 'content-length'), '-',
+    tokens['response-time'](response, request), 'ms',
+    tokens.post(request, response),
+  ].join(' ');
+});
 
 app.use(logger);
 
@@ -91,7 +106,6 @@ app.post('/api/persons', (request, response) => {
   };
 
   persons = persons.concat(person);
-  console.log(person);
   response.status(201).end();
 });
 
