@@ -1,8 +1,10 @@
 const express = require('express');
 const morgan = require('morgan');
+const cors = require('cors');
 
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 const logger = morgan((tokens, request, response) => {
@@ -106,7 +108,7 @@ app.post('/api/persons', (request, response) => {
   };
 
   persons = persons.concat(person);
-  response.status(201).end();
+  response.json(person);
 });
 
 const PORT = 3001;
