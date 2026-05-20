@@ -50,6 +50,10 @@ let persons = [
     }
 ];
 
+app.get('/', (request, response) => {
+  response.send('<h1>/Hello there<h1>');
+});
+
 app.get('/info', (request, response) => {
   let personsInfo = `<p>Phonebook has info for ${persons.length} people</p>`;
   let date = `<p>${new Date()}</p>`;
