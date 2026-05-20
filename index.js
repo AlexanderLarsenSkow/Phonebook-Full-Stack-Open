@@ -6,6 +6,7 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static('dist'));
 
 const logger = morgan((tokens, request, response) => {
   morgan.token('post', (request, response) => {
