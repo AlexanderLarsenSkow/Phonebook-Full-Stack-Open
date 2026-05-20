@@ -50,9 +50,9 @@ let persons = [
     }
 ];
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve("dist/index.html"));
-});
+// app.get("*", (req, res) => {
+//   res.sendFile(path.resolve("dist/index.html"));
+// });
 
 app.get('/', (request, response) => {
   response.send('<h1>/Hello there<h1>');
