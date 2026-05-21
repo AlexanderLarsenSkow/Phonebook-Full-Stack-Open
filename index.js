@@ -71,6 +71,7 @@ app.get('/info', (request, response) => {
 });
 
 app.get('/api/persons', (request, response) => {
+  console.log(path.join(__dirname, 'dist', 'index.html'));
   response.json(persons);
 });
 
