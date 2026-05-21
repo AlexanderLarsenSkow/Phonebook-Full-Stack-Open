@@ -1,6 +1,11 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
+const path = require('path');
+// import { fileURLToPath } from 'url';
+const { fileURLToPath } = require('url');
+
+console.log(path.join(__dirname, 'dist', 'index.html'));
 
 const app = express();
 
