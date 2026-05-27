@@ -1,8 +1,11 @@
+require('dotenv').config();
+
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const path = require('path');
-// import { fileURLToPath } from 'url';
+
+const PersonModel = require('./models/person');
 const { fileURLToPath } = require('url');
 
 console.log(path.join(__dirname, 'dist', 'index.html'));
@@ -32,58 +35,41 @@ const logger = morgan((tokens, request, response) => {
 
 app.use(logger);
 
-let persons = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-];
-
-// app.get("*", (req, res) => {
-//   res.sendFile(path.resolve("dist/index.html"));
-// });
-
 app.get('/', (request, response) => {
   response.send('<h1>/Hello there<h1>');
 });
 
-app.get('/info', (request, response) => {
+async function getPersons() {
+  return await PersonModel.find({});
+}
+
+app.get('/info', async (request, response) => {
+  const persons = await getPersons();
+
   let personsInfo = `<p>Phonebook has info for ${persons.length} people</p>`;
   let date = `<p>${new Date()}</p>`;
 
   response.send(`<div>${personsInfo}\n${date}</div>`);
 });
 
-app.get('/api/persons', (request, response) => {
-  console.log(path.join(__dirname, 'dist', 'index.html'));
+app.get('/api/persons', async (request, response) => {
+  const persons = await getPersons();
   response.json(persons);
 });
 
-app.get('/api/persons/:id', (request, response) => {
-  const id = request.params.id;
-  const person = persons.find(p => p.id === id);
+async function getPerson(id) {
+  return await PersonModel.findById(id);
+}
 
-  if (!person) {
+app.get('/api/persons/:id', async (request, response) => {
+  const id = request.params.id;
+
+  try {
+    const person = await getPerson(id);
+    response.json(person);
+  } catch(e) {
     response.status(404).end();
   }
-
-  response.json(person);
 });
 
 app.delete('/api/persons/:id', (request, response) => {
