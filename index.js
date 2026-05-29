@@ -35,6 +35,16 @@ const logger = morgan((tokens, request, response) => {
 
 app.use(logger);
 
+const errorHandler = (error, request, response, next) => {
+  console.log(error.message);
+
+  if (error.name === 'CastError') {
+    return response.status(400).send({error: 'malformatted id'});
+  }
+
+  next(error);
+}
+
 app.get('/', (request, response) => {
   response.send('<h1>/Hello there<h1>');
 });
@@ -61,26 +71,26 @@ async function getPerson(id) {
   return await PersonModel.findById(id);
 }
 
-app.get('/api/persons/:id', async (request, response) => {
+app.get('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id;
 
   try {
     const person = await getPerson(id);
-    response.json(person);
+    if (person) {
+      response.json(person);
+    } else {
+      response.status(404).end();
+    }
   } catch(e) {
-    response.status(404).end();
+    next(e);
   }
 });
 
 async function deletePerson(id) {
-  try {
-    return await PersonModel.findByIdAndDelete(id);
-  } catch(e) {
-    throw new Error('malformatted id!');
-  }
+  return await PersonModel.findByIdAndDelete(id);
 }
 
-app.delete('/api/persons/:id', async (request, response) => {
+app.delete('/api/persons/:id', async (request, response, next) => {
   const id = request.params.id;
   try {
     const query = await deletePerson(id);
@@ -90,9 +100,7 @@ app.delete('/api/persons/:id', async (request, response) => {
       response.status(404).end()
     }
   } catch(e) {
-    response.status(400).send({
-      error: e.message
-    }).end();
+    next(e);
   }
 });
 
@@ -132,3 +140,5 @@ const PORT = process.env.PORT;
 app.listen(PORT, () => {
   console.log(`Server now running on port ${PORT}`);
 });
+
+app.use(errorHandler);
