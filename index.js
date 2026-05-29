@@ -72,13 +72,27 @@ app.get('/api/persons/:id', async (request, response) => {
   }
 });
 
-app.delete('/api/persons/:id', (request, response) => {
-  const id = request.params.id;
-  const person = persons.find(p => p.id === id);
+async function deletePerson(id) {
+  try {
+    return await PersonModel.findByIdAndDelete(id);
+  } catch(e) {
+    throw new Error('malformatted id!');
+  }
+}
 
-  if (person) {
-    persons = persons.filter(p => p.id !== id);
-    response.status(204).end();
+app.delete('/api/persons/:id', async (request, response) => {
+  const id = request.params.id;
+  try {
+    const query = await deletePerson(id);
+    if (query) {
+      response.status(204).end();
+    } else {
+      response.status(404).end()
+    }
+  } catch(e) {
+    response.status(400).send({
+      error: e.message
+    }).end();
   }
 });
 
