@@ -112,6 +112,12 @@ async function createPerson(person) {
   return await person.save();
 }
 
+function hasName(persons, newName) {
+  return persons.some(({name}) => {
+    return name === newName;
+  })
+}
+
 app.post('/api/persons', async (request, response) => {
   const body = request.body;
 
@@ -121,11 +127,12 @@ app.post('/api/persons', async (request, response) => {
     });
   }
 
-  // if (hasName(body.name)) {
-  //   return response.status(404).json({
-  //     error: 'This person already exists!'
-  //   });
-  // }
+  const persons = await getPersons();
+  if (hasName(persons, body.name)) {
+    return response.status(404).json({
+      error: 'This person already exists!'
+    });
+  }
 
   const person = new PersonModel ({
     name: body.name,
@@ -134,6 +141,38 @@ app.post('/api/persons', async (request, response) => {
 
   const newPerson = await createPerson(person);
   response.json(newPerson);
+});
+
+async function updatePerson(id, name, number) {
+  const person = await getPerson(id);
+  if (!person) return null;
+
+  person.name = name;
+  person.number = number;
+
+  return await person.save();
+}
+
+app.put('/api/persons/:id', async (request, response, next) => {
+  const body = request.body;
+  const id = request.params.id;
+
+  if (!body) {
+    return response.status(400);
+  }
+
+  const {name, number} = body;
+
+  try {
+    const update = await updatePerson(id, name, number);
+    if (update) {
+      response.json(update)
+    } else {
+      response.status(404).end();
+    }
+  } catch(e) {
+    next(e);
+  }
 });
 
 const PORT = process.env.PORT;
