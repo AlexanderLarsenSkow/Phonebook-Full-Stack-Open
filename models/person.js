@@ -15,8 +15,12 @@ async function connect() {
 
 connect();
 
-const PersonSchema = mongoose.Schema({
-  name: String,
+const PersonSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    minLength: 3
+  },
   number: String,
 });
 
