@@ -6,7 +6,7 @@ console.log('Connecting to ', url);
 
 async function connect() {
   try {
-    await mongoose.connect(url, {family: 4});
+    await mongoose.connect(url, { family: 4 });
     console.log('Connected to MongoDB!');
   } catch(error) {
     console.log(`Error connecting to MongoDB: ${error.message}`);
@@ -27,7 +27,7 @@ const PersonSchema = new mongoose.Schema({
       validator(v) {
         return /^\d{2,3}-\d+$/.test(v);
       },
-      message({value}) {
+      message({ value }) {
         return `${value} is not a valid phone number!`;
       }
     },

@@ -3,13 +3,8 @@ require('dotenv').config();
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-const path = require('path');
 
 const PersonModel = require('./models/person');
-const { fileURLToPath } = require('url');
-
-console.log(path.join(__dirname, 'dist', 'index.html'));
-
 const app = express();
 
 app.use(cors());
@@ -17,7 +12,7 @@ app.use(express.json());
 app.use(express.static('dist'));
 
 const logger = morgan((tokens, request, response) => {
-  morgan.token('post', (request, response) => {
+  morgan.token('post', (request) => {
     if (request.method === 'POST') {
       return JSON.stringify(request.body);
     }
@@ -39,11 +34,11 @@ const errorHandler = (error, request, response, next) => {
   console.log(error.message);
 
   if (error.name === 'CastError') {
-    return response.status(400).send({error: 'malformatted id'});
+    return response.status(400).send({ error: 'malformatted id' });
   }
 
   if (error.name === 'ValidationError') {
-    return response.status(400).send({error: error.message});
+    return response.status(400).send({ error: error.message });
   }
 
   next(error);
@@ -108,16 +103,16 @@ app.delete('/api/persons/:id', async (request, response, next) => {
   }
 });
 
-function hasName(name) {
-  return !!persons.find(p => p.name === name)
-}
+// function hasName(name) {
+//   return !!persons.find(p => p.name === name)
+// }
 
 async function createPerson(person) {
   return await person.save();
 }
 
 function hasName(persons, newName) {
-  return persons.some(({name}) => {
+  return persons.some(({ name }) => {
     return name === newName;
   })
 }
@@ -165,7 +160,7 @@ app.put('/api/persons/:id', async (request, response, next) => {
     return response.status(400);
   }
 
-  const {name, number} = body;
+  const { name, number } = body;
 
   try {
     const update = await updatePerson(id, name, number);

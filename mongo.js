@@ -19,7 +19,7 @@ const personSchema = mongoose.Schema({
 const Person = mongoose.model('Person', personSchema);
 
 async function createPerson(name, number) {
-  const newPerson = new Person({name, number});
+  const newPerson = new Person({ name, number });
 
   await newPerson.save();
   console.log(`added ${name} number ${number} to phonebook!`);
@@ -30,9 +30,9 @@ async function createPerson(name, number) {
 async function getPersons() {
   const persons = await Person.find({});
 
-  function logPerson({name, number}) {
+  function logPerson({ name, number }) {
     console.log(name, number);
-  } 
+  }
 
   console.log('Phonebook:');
   persons.forEach(logPerson);
@@ -40,8 +40,8 @@ async function getPersons() {
 }
 
 async function runApp() {
-  const arguments = process.argv;
-  const [name, number] = [arguments[3], arguments[4]];
+  const args = process.argv;
+  const [name, number] = [args[3], args[4]];
 
   if (name && number) {
     await createPerson(name, number);
